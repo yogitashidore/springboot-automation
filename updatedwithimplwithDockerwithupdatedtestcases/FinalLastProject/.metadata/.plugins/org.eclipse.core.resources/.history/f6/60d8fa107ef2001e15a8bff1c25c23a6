@@ -1,0 +1,11 @@
+package net.shadervertex.sms.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import net.shadervertex.sms.entity.Student;
+
+public interface StudentRepository extends JpaRepository<Student, Long> {
+    
+    // No need to define custom update method
+
+    // No need to define custom save method, use JpaRepository's save method instead
+}

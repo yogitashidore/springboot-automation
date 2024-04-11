@@ -1,0 +1,44 @@
+package net.shadervertex.sms;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import net.shadervertex.sms.entity.Student;
+import net.shadervertex.sms.service.StudentService;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
+@SpringBootTest(classes = StudentManagementSystemApplication.class)
+public class StudentControllerTest {
+    private static final String END_POINT_PATH = "/students"; // Correct endpoint path
+    
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
+    @MockBean private StudentService studentService; // Correct mock bean
+    
+    @Test
+    public void testAddShouldReturn400BadRequest() throws Exception {
+        // Create a Student object with empty fields
+        Student newStudent = new Student();
+        newStudent.setFirstName("");
+        newStudent.setLastName("");
+        newStudent.setEmail("");
+        
+        String requestBody = objectMapper.writeValueAsString(newStudent);
+        
+        mockMvc.perform(post(END_POINT_PATH).contentType("application/json")
+                .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andDo(print()); // Use andDo(print()) to print the response
+    }
+}
+
+
+

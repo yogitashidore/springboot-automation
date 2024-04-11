@@ -1,0 +1,54 @@
+package net.shadervertex.sms;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.http.MediaType; // Correct import statement
+
+import net.shadervertex.sms.controller.StudentController;
+import net.shadervertex.sms.entity.Student;
+import net.shadervertex.sms.service.StudentService;
+
+@WebMvcTest(StudentController.class)
+public class StudentControllerTest {
+
+    private static final String END_POINT_PATH = "/students";
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private StudentService studentService;
+
+    @Test
+    public void testAddShouldReturn201Created() throws Exception {
+        Student newStudent = new Student("John", "Doe", "john@example.com");
+
+        doNothing().when(studentService).saveStudent(any(Student.class));
+
+        String requestBody = objectMapper.writeValueAsString(newStudent);
+
+        mockMvc.perform(post(END_POINT_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.firstName", is("John")))
+                .andExpect(jsonPath("$.lastName", is("Doe")))
+                .andExpect(jsonPath("$.email", is("john@example.com")));
+    }
+}

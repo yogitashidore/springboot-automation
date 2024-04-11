@@ -1,0 +1,47 @@
+package net.shadervertex.sms;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTestContextBootstrapper;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.BootstrapWith;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.http.MediaType;
+import net.shadervertex.sms.service.StudentService;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@BootstrapWith(value = SpringBootTestContextBootstrapper.class)
+public class StudentControllerTests {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private StudentService studentService; // Mock the StudentService
+
+    @Test
+    public void testGetStudents() throws Exception {
+        mockMvc.perform(get("/students"))
+               .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void testGetStudentById() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/students/{id}", 1L))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection()) // Check if it's a redirection
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/expected-redirected-url")) // Add the expected redirected URL
+                .andExpect(MockMvcResultMatchers.redirectedUrlPattern("/expected-redirected-url/*")) // Pattern match if needed
+                .andExpect(MockMvcResultMatchers.redirectedUrl("http://localhost:8080/expected-redirected-url")) // Full URL match if needed
+                .andExpect(MockMvcResultMatchers.redirectedUrlPattern("http://localhost:8080/expected-redirected-url/*")) // Full URL pattern match if needed
+                .andExpect(MockMvcResultMatchers.redirectedUrlPattern("https://example.com/expected-redirected-url/*")); // Full URL pattern match if needed
+    }
+
+}

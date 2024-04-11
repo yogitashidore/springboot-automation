@@ -1,0 +1,189 @@
+package net.shadervertex.sms;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import net.shadervertex.sms.controller.StudentController;
+import net.shadervertex.sms.entity.Student;
+import net.shadervertex.sms.service.StudentService;
+
+@WebMvcTest(StudentController.class)
+public class StudentControllerTest {
+
+    private static final String END_POINT_PATH = "/students";
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private StudentService studentService;
+
+    @Test
+    public void testAddShouldReturn201Created() throws Exception {
+        Student newStudent = new Student("John", "Doe", "john@example.com");
+
+        // Mocking saveStudent method using doAnswer for void method
+        doAnswer(invocation -> null).when(studentService).saveStudent(any());
+
+        String requestBody = objectMapper.writeValueAsString(newStudent);
+
+        mockMvc.perform(post(END_POINT_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.firstName", is("John")))
+                .andExpect(jsonPath("$.lastName", is("Doe")))
+                .andExpect(jsonPath("$.email", is("john@example.com")));
+    }
+
+    @Test
+    public void testAddShouldReturn400BadRequest() throws Exception {
+        Student newStudent = new Student();
+
+        String requestBody = objectMapper.writeValueAsString(newStudent);
+
+        mockMvc.perform(post(END_POINT_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testGetShouldReturn404NotFound() throws Exception {
+        Long studentId = 123L;
+        String requestURI = END_POINT_PATH + "/" + studentId;
+
+        when(studentService.getStudentById(studentId)).thenReturn(null);
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testGetShouldReturn200OK() throws Exception {
+        Long studentId = 1L;
+        String requestURI = END_POINT_PATH + "/" + studentId;
+        String email = "john@example.com";
+
+        Student student = new Student("John", "Doe", email);
+
+        when(studentService.getStudentById(studentId)).thenReturn(student);
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.email", is(email)));
+    }
+
+    @Test
+    public void testListShouldReturn204NoContent() throws Exception {
+        when(studentService.getAllStudents()).thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get(END_POINT_PATH))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testListShouldReturn200OK() throws Exception {
+        Student student1 = new Student("John", "Doe", "john@example.com");
+        Student student2 = new Student("Jane", "Smith", "jane@example.com");
+
+        List<Student> students = List.of(student1, student2);
+
+        when(studentService.getAllStudents()).thenReturn(students);
+
+        mockMvc.perform(get(END_POINT_PATH))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].email", is("john@example.com")))
+                .andExpect(jsonPath("$[1].email", is("jane@example.com")));
+    }
+
+    @Test
+    public void testDeleteShouldReturn404NotFound() throws Exception {
+        Long studentId = 123L;
+        String requestURI = END_POINT_PATH + "/" + studentId;
+
+        doThrow(new RuntimeException()).when(studentService).deleteStudentById(studentId);
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testDeleteShouldReturn204NoContent() throws Exception {
+        Long studentId = 1L;
+        String requestURI = END_POINT_PATH + "/" + studentId;
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testUpdateShouldReturn404NotFound() throws Exception {
+        Long studentId = 123L;
+        String requestURI = END_POINT_PATH + "/" + studentId;
+
+        Student student = new Student("John", "Doe", "john@example.com");
+
+        doThrow(new RuntimeException()).when(studentService).updateStudent(student);
+
+        String requestBody = objectMapper.writeValueAsString(student);
+
+        mockMvc.perform(put(requestURI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testUpdateShouldReturn400BadRequest() throws Exception {
+        Long studentId = 123L;
+        String requestURI = END_POINT_PATH + "/" + studentId;
+
+        Student student = new Student("", "", "");
+
+        String requestBody = objectMapper.writeValueAsString(student);
+
+        mockMvc.perform(put(requestURI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testUpdateShouldReturn200OK() throws Exception {
+        Long studentId = 1L;
+        String requestURI = END_POINT_PATH + "/" + studentId;
+
+        Student student = new Student("John", "Doe", "john@example.com");
+
+        when(studentService.updateStudent(any(Student.class))).thenReturn(1);
+
+
+        String requestBody = objectMapper.writeValueAsString(student);
+
+        mockMvc.perform(put(requestURI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email", is("john@example.com")));
+    }
+}

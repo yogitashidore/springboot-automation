@@ -1,0 +1,50 @@
+package net.shadervertex.sms.service.impl;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import net.shadervertex.sms.entity.Student;
+import net.shadervertex.sms.mapper.StudentMapper;
+import net.shadervertex.sms.repository.StudentRepository;
+import net.shadervertex.sms.service.StudentService;
+
+@Service
+public class StudentServiceImpl implements StudentService {
+
+    private StudentRepository studentRepository;
+    private final StudentMapper studentMapper;
+
+    public StudentServiceImpl(StudentMapper studentMapper) {
+        this.studentMapper = studentMapper;
+    }
+
+    @Override
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
+    }
+
+    @Override
+    public Student saveStudent(Student student) {
+        return studentRepository.save(student);
+    }
+
+
+
+    @Override
+    public Student getStudentById(Long id) {
+        return studentRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public int updateStudent(Student student) {
+        // Call the updateStudent method from the mapper and return the result
+        return studentMapper.updateStudent(student);
+    }
+
+
+    @Override
+    public void deleteStudentById(Long id) {
+        studentRepository.deleteById(id);
+    }
+}

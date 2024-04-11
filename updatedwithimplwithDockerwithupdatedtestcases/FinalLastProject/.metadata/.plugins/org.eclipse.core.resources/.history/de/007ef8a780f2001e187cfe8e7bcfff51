@@ -1,0 +1,10 @@
+package net.shadervertex.sms.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository; // Import Repository annotation
+import net.shadervertex.sms.entity.Student;
+
+@Repository // Add @Repository annotation
+public interface StudentRepository extends JpaRepository<Student, Long> {
+    // No need for custom methods if you're using JpaRepository
+}

@@ -1,0 +1,5 @@
+package net.shadervertex.sms.service.impl;
+
+public class StudentServiceImpl {
+
+}

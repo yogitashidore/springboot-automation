@@ -1,0 +1,46 @@
+
+
+
+
+package net.shadervertex.sms.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import net.shadervertex.sms.entity.Student;
+import net.shadervertex.sms.repository.StudentRepository;
+
+@Service
+public class StudentService implements StudentService {
+
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @Override
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
+    }
+    
+    @Override
+    public void saveStudent(Student student) {
+        studentRepository.save(student);
+    }
+
+    @Override
+    public Student getStudentById(Long id) {
+        return studentRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public int updateStudent(Student student) {
+        // Implement update logic
+        return 0;
+    }
+
+    @Override
+    public void deleteStudentById(Long id) {
+        studentRepository.deleteById(id);
+    }
+}

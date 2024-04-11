@@ -1,0 +1,80 @@
+package net.shadervertex.sms;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.shadervertex.sms.entity.Student;
+import net.shadervertex.sms.service.StudentService;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+import java.util.Collections;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@SpringJUnitWebConfig
+@WebMvcTest(StudentController.class)
+@AutoConfigureMockMvc
+public class StudentControllerTests {
+
+    private static final String END_POINT_PATH = "/students"; // Update the endpoint path
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private StudentService studentService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private LocalValidatorFactoryBean validator;
+
+    @Test
+    public void testGetStudents() throws Exception {
+        mockMvc.perform(get(END_POINT_PATH))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetStudentById() throws Exception {
+        mockMvc.perform(get(END_POINT_PATH + "/{id}", 1L))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(END_POINT_PATH));
+    }
+
+    @Test
+    public void testSaveStudent_ValidStudent() throws Exception {
+        Student student = new Student("John", "Doe", "john@example.com");
+
+        mockMvc.perform(post(END_POINT_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(student)))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(END_POINT_PATH));
+    }
+
+    @Test
+    public void testSaveStudent_InvalidFirstName() throws Exception {
+        Student student = new Student("", "Doe", "john@example.com");
+
+        mockMvc.perform(post(END_POINT_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(student)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("create_student"))
+                .andExpect(model().attributeHasFieldErrors("student", "firstName"));
+    }
+
+    // Add other test methods for edit, update, delete endpoints
+
+}

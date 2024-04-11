@@ -1,0 +1,56 @@
+package net.shadervertex.sms;
+
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import net.shadervertex.sms.controller.StudentController;
+import net.shadervertex.sms.entity.Student;
+import net.shadervertex.sms.service.StudentService;
+
+@WebMvcTest(StudentController.class)
+public class StudentControllerTest {
+
+    private static final String END_POINT_PATH = "/students";
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean(name = "studentServiceImpl") // Specify the bean to replace with the mock
+    private StudentService service;
+
+    @Test
+    public void testAddShouldReturnBadRequest() throws Exception {
+        // Create an invalid Student object with empty fields
+        Student invalidStudent = new Student();
+
+        // Convert the invalid Student object to JSON
+        String requestBody = objectMapper.writeValueAsString(invalidStudent);
+
+        // Mock the behavior of the service method
+        when(service.saveStudent(any(Student.class))).thenReturn(null);
+
+        // Perform the POST request to the endpoint
+        mockMvc.perform(post(END_POINT_PATH)
+                .contentType("application/json")
+                .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        // Verify that the saveStudent method of the service is called with any Student object
+        verify(service).saveStudent(any(Student.class));
+    }
+}

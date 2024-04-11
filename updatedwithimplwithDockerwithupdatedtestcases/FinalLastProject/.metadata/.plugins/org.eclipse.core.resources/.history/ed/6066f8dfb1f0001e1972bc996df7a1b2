@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to Student Record</title>
+</head>
+<body>
+    <div id="loginForm">
+        <h2>Login</h2>
+        <label for="username">Username:</label>
+        <input type="text" id="username">
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password">
+        <br>
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div id="welcomeMessage" style="display: none;">
+        <h2>Welcome to Student Record</h2>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        function login() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            // Here you would send username and password to your backend for authentication
+            // For simplicity, let's assume login is successful
+            var isLoggedIn = true;
+
+            if (isLoggedIn) {
+                document.getElementById("loginForm").style.display = "none";
+                document.getElementById("welcomeMessage").style.display = "block";
+            } else {
+                alert("Login failed. Please check your credentials.");
+            }
+        }
+
+        function logout() {
+            // Here you would perform logout actions, such as clearing session data or tokens
+            // For simplicity, let's just reload the page
+            location.reload();
+        }
+    </script>
+</body>
+</html>

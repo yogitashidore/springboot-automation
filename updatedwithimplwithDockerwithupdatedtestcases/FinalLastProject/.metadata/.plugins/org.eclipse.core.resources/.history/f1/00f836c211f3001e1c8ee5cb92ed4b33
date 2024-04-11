@@ -1,0 +1,17 @@
+package net.shadervertex.sms.service;
+
+import java.util.List;
+
+import net.shadervertex.sms.entity.Student;
+
+public interface StudentService {
+    List<Student> getAllStudents();
+    
+    void saveStudent(Student student); // Change the return type to void
+    
+    Student getStudentById(Long id);
+    
+    int updateStudent(Student student);
+    
+    void deleteStudentById(Long id);
+}

@@ -1,0 +1,5 @@
+package net.shadervertex.sms.exception;
+
+public class ErrorDetails {
+
+}

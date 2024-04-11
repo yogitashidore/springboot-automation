@@ -1,0 +1,52 @@
+package net.shadervertex.sms.service.impl;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import net.shadervertex.sms.entity.Student;
+import net.shadervertex.sms.mapper.StudentMapper;
+import net.shadervertex.sms.repository.StudentRepository;
+import net.shadervertex.sms.service.StudentService;
+
+@Service
+public class StudentServiceImpl implements StudentService {
+
+    private StudentRepository studentRepository;
+    private final StudentMapper studentMapper;
+
+    public StudentServiceImpl(StudentMapper studentMapper) {
+        this.studentMapper = studentMapper;
+    }
+
+    @Override
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
+    }
+
+    @Override
+    public Student saveStudent(Student student) {
+        return studentRepository.save(student);
+    }
+
+
+
+    @Override
+    public Student getStudentById(Long id) {
+        return studentRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public int updateStudent(Student student) {
+        // Call your MyBatis mapper method here to update the student
+        // and return the result, which could be the number of affected rows
+        // or a custom value indicating success/failure.
+        return studentMapper.updateStudent(student);
+    }
+
+
+    @Override
+    public void deleteStudentById(Long id) {
+        studentRepository.deleteById(id);
+    }
+}

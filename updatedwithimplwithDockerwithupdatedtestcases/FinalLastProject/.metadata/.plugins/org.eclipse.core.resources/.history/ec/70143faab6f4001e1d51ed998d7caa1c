@@ -1,0 +1,61 @@
+package net.shadervertex.sms.service.impl;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import net.shadervertex.sms.entity.Student;
+import net.shadervertex.sms.repository.StudentRepository;
+import net.shadervertex.sms.service.StudentService;
+
+@Service
+public class StudentServiceImpl implements StudentService {
+
+    private final StudentRepository studentRepository;
+
+    @Autowired
+    public StudentServiceImpl(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+    }
+
+    @Override
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
+    }
+
+    @Override
+    public Student saveStudent(Student student) {
+        // You can directly return the saved student without fetching it again
+        return studentRepository.save(student);
+    }
+
+    @Override
+    public Student getStudentById(Long id) {
+        // Use findById method which returns an Optional
+        Optional<Student> optionalStudent = studentRepository.findById(id);
+        return optionalStudent.orElse(null); // Return null if optionalStudent is empty
+    }
+
+    @Override
+    public Student updateStudent(Student student) {
+        // Check if the student exists
+        Optional<Student> existingStudentOptional = studentRepository.findById(student.getId());
+        if (existingStudentOptional.isPresent()) {
+            Student existingStudent = existingStudentOptional.get();
+            existingStudent.setFirstName(student.getFirstName());
+            existingStudent.setLastName(student.getLastName());
+            existingStudent.setEmail(student.getEmail());
+            return studentRepository.save(existingStudent); // Save and return the updated student
+        } else {
+            // Handle the case where the student doesn't exist
+            throw new IllegalArgumentException("Student not found with ID: " + student.getId());
+        }
+    }
+
+    @Override
+    public void deleteStudentById(Long id) {
+        studentRepository.deleteById(id);
+    }
+}

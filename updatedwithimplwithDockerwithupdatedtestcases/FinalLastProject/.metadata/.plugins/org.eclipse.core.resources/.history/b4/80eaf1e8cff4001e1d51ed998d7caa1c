@@ -1,0 +1,57 @@
+package net.shadervertex.sms.service.impl;
+
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import net.shadervertex.sms.entity.Student;
+import net.shadervertex.sms.mapper.StudentMapper;
+import net.shadervertex.sms.repository.StudentRepository;
+import net.shadervertex.sms.service.StudentService;
+
+@Service
+public class StudentServiceImpl implements StudentService {
+
+    private StudentRepository studentRepository;
+    private final StudentMapper studentMapper;
+
+    public StudentServiceImpl(StudentMapper studentMapper) {
+        this.studentMapper = studentMapper;
+    }
+
+    @Override
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
+    }
+
+    @Override
+    public Student saveStudent(Student student) {
+        return studentRepository.save(student);
+    }
+
+
+
+    @Override
+    public Student getStudentById(Long id) {
+        return studentRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public int updateStudent(Student student) {
+        // Save method from Spring Data JPA automatically handles update if the entity already exists
+        Student updatedStudent = studentRepository.save(student);
+        
+        // You can return any meaningful value indicating the update operation result,
+        // such as 1 for successful update, or the number of fields changed, etc.
+        return (updatedStudent != null) ? 1 : 0;
+    }
+
+
+
+
+    @Override
+    public void deleteStudentById(Long id) {
+        studentRepository.deleteById(id);
+    }
+}
